@@ -1,0 +1,16 @@
+class AWSConfig:
+    def __init__(self, config):
+        self.KEY = config.get('AWS', 'KEY')
+        self.SECRET = config.get('AWS','SECRET')
+        self.HOST = config.get('CLUSTER','HOST')
+        self.DWH_CLUSTER_TYPE = config.get('CLUSTER', 'DWH_CLUSTER_TYPE')
+        self.DWH_NUM_NODES = config.get('CLUSTER', 'DWH_NUM_NODES')
+        self.DWH_NODE_TYPE = config.get('CLUSTER', 'DWH_NODE_TYPE')
+        self.DWH_IAM_ROLE_NAME = config.get('CLUSTER', 'DWH_IAM_ROLE_NAME')
+        self.DWH_CLUSTER_IDENTIFIER = config.get('CLUSTER', 'DWH_CLUSTER_IDENTIFIER')
+        self.DWH_DB_NAME = config.get('CLUSTER', 'DB_NAME')
+        self.DWH_DB_USER = config.get('CLUSTER', 'DB_USER')
+        self.DWH_DB_PASSWORD = config.get('CLUSTER', 'DB_PASSWORD')
+        self.DWH_PORT = config.get('CLUSTER', 'DB_PORT')
+        self.ARN = config.get('IAM_ROLE', 'ARN')
+        self.HOST = config.get('CLUSTER', 'HOST')
