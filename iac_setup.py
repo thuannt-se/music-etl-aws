@@ -119,18 +119,7 @@ def write_to_config(awsConfig: AWSConfig):
     cfgfile.close()
 
 def main():
-    config = configparser.ConfigParser()
-    config.read('dwh.cfg')
-    s3 = boto3.resource('s3',
-                        region_name="us-west-2",
-                        aws_access_key_id=config.get('AWS', 'KEY'),
-                        aws_secret_access_key=config.get('AWS','SECRET')
-                        )
-    sampleDbBucket = s3.Bucket("udacity-dend")
-
-    for obj in sampleDbBucket.objects.filter(Prefix='song-data'):
-        print(obj.key)
-    #initialize_aws_instances()
+    initialize_aws_instances()
 
 if __name__ == "__main__":
     main()

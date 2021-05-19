@@ -56,7 +56,7 @@ staging_songs_table_create = ("""create table if not exists staging_songs
 songplay_table_create = ("""create table if not exists songplays
                             (
                                 songplays_id bigint IDENTITY(0,1) primary key, 
-                                start_time numeric NOT NULL, 
+                                start_time TIMESTAMP NOT NULL, 
                                 user_id varchar NOT NULL, 
                                 level varchar, 
                                 song_id varchar, 
@@ -95,7 +95,7 @@ artist_table_create = ("""create table if not exists artists
 
 time_table_create = ("""create table if not exists times
                             (
-                                start_time numeric primary key, 
+                                start_time TIMESTAMP primary key, 
                                 hour int, 
                                 day int, 
                                 week int, 
@@ -119,12 +119,12 @@ staging_songs_copy = ("""copy staging_songs from {}
 # FINAL TABLES
 
 songplay_table_insert = ("""insert into songplays(start_time, user_id, level, song_id, artist_id, session_id, location, user_agent) 
-                            select ts, userId, level, s.song_id , ar.artist_id 
+                            select dateadd(sec, (ts/1000)::integer, '1970-01-01'::timestamp), userId, level, s.song_id , ar.artist_id 
                             , sessionId, se.location, userAgent 
-                            from staging_events se join artists ar on se.artist = ar.name join songs s on se.song = s.title""")
+                            from staging_events se join artists ar on se.artist = ar.name join songs s on se.song = s.title where se.page='NextSong' """)
 
-user_table_insert = ("""insert into users(user_id, first_name, last_name, gender, level) select userId, firstName, lastName, gender, level
-                            from staging_events where userId is not null
+user_table_insert = ("""insert into users(user_id, first_name, last_name, gender, level) select DISTINCT userId, firstName, lastName, gender, level
+                            from staging_events where userId is not null and page='NextSong'
 """)
 
 song_table_insert = ("""insert into songs(song_id, title, artist_id, year, duration) select song_id, title, artist_id, year, duration from staging_songs
@@ -135,7 +135,7 @@ artist_table_insert = ("""insert into artists(artist_id, name, location, latitud
 """)
 
 time_table_insert = ("""insert into times(start_time, hour, day, week, month, year, weekday) 
-                        select ts as start_time, 
+                        select dateadd(sec, (ts/1000)::integer, '1970-01-01'::timestamp) as start_time, 
                         EXTRACT(HOUR FROM dateadd(sec, (ts/1000)::integer, '1970-01-01'::timestamp)) as hour,
                         EXTRACT(DAY FROM  dateadd(sec, (ts/1000)::integer, '1970-01-01'::timestamp)) as day,
                         EXTRACT(WEEK FROM  dateadd(sec, (ts/1000)::integer, '1970-01-01'::timestamp)) as week,
@@ -149,5 +149,5 @@ time_table_insert = ("""insert into times(start_time, hour, day, week, month, ye
 
 create_table_queries = [staging_events_table_create, staging_songs_table_create, songplay_table_create, user_table_create, song_table_create, artist_table_create, time_table_create]
 drop_table_queries = [staging_events_table_drop, staging_songs_table_drop, songplay_table_drop, user_table_drop, song_table_drop, artist_table_drop, time_table_drop]
-copy_table_queries = [staging_songs_copy]
+copy_table_queries = [staging_events_copy, staging_songs_copy]
 insert_table_queries = [user_table_insert, song_table_insert, artist_table_insert, time_table_insert, songplay_table_insert]
